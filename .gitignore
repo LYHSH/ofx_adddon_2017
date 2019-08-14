@@ -1,0 +1,17 @@
+ofxAccelerometer/
+ofxAndroid/
+ofxAssimpModelLoader/
+ofxEmscripten/
+ofxGPS/
+ofxGui/
+ofxiOS/
+ofxKinect/
+ofxNetwork/
+ofxOpenCv/
+ofxOsc/
+ofxPoco/
+ofxSvg/
+ofxThreadedImageLoader/
+ofxUnitTests/
+ofxVectorGraphics/
+ofxXmlSettings/
