@@ -15,3 +15,7 @@ ofxThreadedImageLoader/
 ofxUnitTests/
 ofxVectorGraphics/
 ofxXmlSettings/
+ofxAvCodec/
+ofxHapPlayer/
+ofxImGui/
+ofxVLCVideoPlayer/
