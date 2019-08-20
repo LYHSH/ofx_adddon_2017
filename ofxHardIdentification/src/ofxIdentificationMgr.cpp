@@ -1,5 +1,6 @@
 #include "ofxIdentificationMgr.h"
 #include "ofxHardIdentification.h"
+
 bool ofxIdentificationMgr::isRegistered = false;
 int ofxIdentificationMgr::checkKey = -1;
 ofxIdentificationMgr::ofxIdentificationMgr()
@@ -23,18 +24,11 @@ void ofxIdentificationMgr::setup()
 		{
 			ofLogError() << "checkKey = " << checkKey << endl;
 		}
-#ifdef UNICODE
-		if (MessageBox(HWND_DESKTOP, L"本主机尚未注册或注册码错误，请在指定主机上运行软件，或者联系软件供应商！", L"Error", MB_OK | MB_ICONEXCLAMATION))
-		{
-			ofExit(-3);
-		}
-#else
+		
 		if (MessageBox(HWND_DESKTOP, "本主机尚未注册或注册码错误，请在指定主机上运行软件，或者联系软件供应商！", "Error", MB_OK | MB_ICONEXCLAMATION))
 		{
 			ofExit(-3);
 		}
-#endif // !UNICODE
-		
 	}
 }
 
@@ -66,8 +60,16 @@ bool ofxIdentificationMgr::check()
 
 void ofxIdentificationMgr::generateCheckStr()
 {
+	generateCheckStr("identificationSource.xml");
+}
+
+void ofxIdentificationMgr::generateCheckStr(string _filename)
+{
 	ofxXmlSettings xml;
-	xml.load("identificationSource.xml");
+	if (!xml.load(_filename))
+	{
+		ofLogError("ofxIdentificationMgr") << "load " << _filename << " failed" << endl;
+	}
 	string source = xml.getValue("SOURCE", "00000000000000000000000000000000");
 
 	string result = ofxHardIdentification::getCheckStr(source);
@@ -75,6 +77,30 @@ void ofxIdentificationMgr::generateCheckStr()
 	xml.clear();
 	xml.addValue("RESULT", result);
 	xml.save("identificationResult.xml");
+
+	ofLogNotice() << "SOURCE:" << source << endl;
+	ofLogNotice() << "RESULT:" << result << endl;
+	ofLogNotice() << "build sucess" << endl;
+}
+
+void ofxIdentificationMgr::generateCheckStr(string _filename, string _dir)
+{
+	ofxXmlSettings xml;
+	if (!xml.load(_dir + _filename))
+	{
+		ofLogError("ofxIdentificationMgr") << "load " << _dir << _filename << " failed" << endl;
+	}
+	string source = xml.getValue("SOURCE", "00000000000000000000000000000000");
+
+	string result = ofxHardIdentification::getCheckStr(source);
+
+	xml.clear();
+	xml.addValue("RESULT", result);
+	xml.save(_dir + "identificationResult.xml");
+
+	ofLogNotice() << "SOURCE:" << source << endl;
+	ofLogNotice() << "RESULT:" << result << endl;
+	ofLogNotice() << "build sucess" << endl;
 }
 
 void ofxIdentificationMgr::setExtraInfo(string _extraInfoStr)

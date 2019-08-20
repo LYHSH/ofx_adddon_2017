@@ -27,7 +27,7 @@ void ofxPJnetControlBase::setup(string _ip)
 {
 	ipAddress = _ip;
 
-	startThread(true, false);
+	startThread();
 }
 
 void ofxPJnetControlBase::setOn()

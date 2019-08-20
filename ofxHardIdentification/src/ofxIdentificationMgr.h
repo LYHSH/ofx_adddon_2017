@@ -17,6 +17,8 @@ public:
 	static void generateIdentification();
 	static bool check();
 	static void generateCheckStr();
+	static void generateCheckStr(string _filename);
+	static void generateCheckStr(string _filename,string _dir);
 	static void setExtraInfo(string _extraInfoStr);
 private:
 	ofxIdentificationMgr();
