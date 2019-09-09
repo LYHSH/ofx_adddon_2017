@@ -156,7 +156,7 @@ void projectBlendIniter::showGui(bool & _flag)
 	}
 	ImGui::NewLine();
 	ImGui::NewLine();
-//	static bool showOkCancleWindow = false;
+
 	if (ImGui::Button("generate", ofVec2f(200, 100)))
 	{
 		int res = MessageBox(NULL, TEXT("原有数据将会被覆盖，确认初始化数据么？"), TEXT("提示"), MB_OKCANCEL);
@@ -164,30 +164,8 @@ void projectBlendIniter::showGui(bool & _flag)
 		{
 			handleDataSave();
 		}
-		//showOkCancleWindow = true;
+		
 	}
-
-// 	if (showOkCancleWindow)
-// 	{
-// 		ImGui::SetNextWindowSize(ofVec2f(ofGetWidth(), 300.0f), ImGuiCond_Always);
-// 		ImGui::SetNextWindowPos(ofVec2f(0,0), ImGuiCond_Always);
-// 		ImGui::Begin("Another Window", &showOkCancleWindow);
-// 		ImGui::SameLine(500.0F);
-// 		
-// 		ImGui::Text("Are you sure?");
-// 		ImGui::SameLine(300.0f);
-// 		if (ImGui::Button("YES", ofVec2f(200, 200)))
-// 		{
-// 			handleDataSave();
-// 			showOkCancleWindow = false;
-// 		}
-// 		ImGui::SameLine(600.0f);
-// 		if (ImGui::Button("NO", ofVec2f(200, 200)))
-// 		{
-// 			showOkCancleWindow = false;
-// 		}
-// 		ImGui::End();
-// 	}
 
 	ImGui::End();
 }
@@ -248,9 +226,15 @@ void projectBlendIniter::handleResolutionSetting(string _theme)
 
 void projectBlendIniter::handleDataSave()
 {
+	//删除旧有数据
+	ofFile file(getDir());
+	if (file.exists())
+	{
+		file.remove(true);
+	}
+
 	ofDirectory dir;
 	dir.listDir(getDir());
-	
 	if (!dir.exists())
 	{
 		dir.create(true);
@@ -303,8 +287,6 @@ void projectBlendIniter::handleDataSave()
 			blendxml.addValue("SINGLE_SCREEN_HEIGHT", singleScreenH);
 
 			blendxml.addValue("SHOW_SCALE", 1.0f);
-			blendxml.addValue("HOR_OFFSET", 0);
-			blendxml.addValue("VER_OFFSET", 0);
 
 			gridPicPath = "gridPic/" + ofToString(horProjectNums) + "x" + ofToString(verProjectNums) + ".png";
 			blendxml.addValue("GRID_PIC", gridPicPath);

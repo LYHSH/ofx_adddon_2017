@@ -11,6 +11,7 @@ ofImage wordButton::redSmallImg;
 ofSoundPlayer wordButton::touchSound;
 float wordButton::sleepTimeLen;
 ofColor wordButton::btnColor = ofColor(255, 255, 255);
+int wordButton::fontSize = 22;
 wordButton::wordButton()
 {
 	init();
@@ -95,7 +96,6 @@ void wordButton::draw()
 
 	ofTranslate(touchRect.getCenter());
 
-	static int const fontSize = 50;
 	switch (wordType)
 	{
 	case wordButton::WORD_STRING:
@@ -125,7 +125,20 @@ void wordButton::draw()
 		}
 		ofPushStyle();
 		ofSetColor(btnColor);
-		font.drawString(wordStr,-stringRect.getWidth()/2,stringRect.getHeight()/3);
+		{
+			ofRectangle wordRect = font.getStringBoundingBox(wordStr,0,0);
+			ofPushMatrix();
+		//	ofTranslate(-touchRect.getWidth() / 2, -touchRect.getHeight() / 2);
+		//	float x = (touchRect.getWidth() - wordRect.getWidth()) * 0.5f - wordRect.getX();
+		//	float y = (touchRect.getHeight() - wordRect.getHeight()) * 0.5f - wordRect.getY();
+			float x = -wordRect.getWidth() * 0.5f - wordRect.getX();
+			float y = -wordRect.getHeight()  * 0.5f - wordRect.getY();
+			font.drawString(wordStr, x,y);
+			//font.drawString(wordStr, -stringRect.getWidth() / 2, stringRect.getHeight() / 3);
+			ofPopMatrix();
+			
+		}
+		
 		ofPopStyle();
 	}
 		break;
@@ -219,6 +232,11 @@ void wordButton::setBtnColor(ofColor _color)
 	btnColor = _color;
 }
 
+void wordButton::setBtnFontSize(int _size)
+{
+	fontSize = _size;
+}
+
 void wordButton::init()
 {
 	static bool first = true;
@@ -238,7 +256,7 @@ void wordButton::init()
 		redSmallImg.setAnchorPercent(0.5, 0.5);
 
 
-		font.load("fonts/btn.TTF", 22);
+		font.load("fonts/btn.TTF", fontSize);
 		ofxTrueTypeFontUC::setGlobalDpi(96);
 
 		touchSound.load("sound.wav");

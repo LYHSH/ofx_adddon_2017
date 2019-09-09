@@ -1,16 +1,7 @@
 #include "ofxMacPowControl.h"
 
-
-static bool m_bWinsockInit = false;
 ofxMacPowControl::ofxMacPowControl()
 {
-	if (m_bWinsockInit) {
-		unsigned short vr;
-		WSADATA	wsaData;
-		vr = MAKEWORD(2, 2);
-		WSAStartup(vr, &wsaData);
-		m_bWinsockInit = true;
-	}
 }
 
 
@@ -20,32 +11,14 @@ ofxMacPowControl::~ofxMacPowControl()
 
 void ofxMacPowControl::setup()
 {
-	udpConnection.Create();
-	udpConnection.SetNonBlocking(true);
+	shutdownUdp.Create();
+	shutdownUdp.SetNonBlocking(true);
 
 
-	m_hSocket = socket(AF_INET, SOCK_DGRAM, 0);
-	if (m_hSocket != INVALID_SOCKET)
-	{		
-		int unused = true;
-		setsockopt(m_hSocket, SOL_SOCKET, SO_BROADCAST, (char*)&unused, sizeof(unused));
-	}
-
-	memset((void*)&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(10000);
-//	addr.sin_addr.s_addr = inet_addr("255.255.255.255");//π„≤•µÿ÷∑
-	addr.sin_addr.S_un.S_addr = htonl(INADDR_BROADCAST);
-
-	bool nonBlocking = true;
-
-#ifdef TARGET_WIN32
-	unsigned long arg = nonBlocking;
-	int retVal = ioctlsocket(m_hSocket, FIONBIO, &arg);
-#else
-	int arg = nonBlocking;
-	int retVal = ioctl(m_hSocket, FIONBIO, &arg);
-#endif
+	wakeupUdp.Create();
+	wakeupUdp.SetNonBlocking(true);
+	wakeupUdp.SetEnableBroadcast(true);
+	wakeupUdp.Connect("255.255.255.255", 9999);
 }
 
 void ofxMacPowControl::powOn(string macStr)
@@ -66,8 +39,8 @@ void ofxMacPowControl::powOn(string macStr)
 	//memcpy, read MSDN for more details.
 	for (int i = 0; i < 15; i++)
 		memcpy(&magicP[(i + 2) * 6], &magicP[6], 6);
-
-	int res = sendto(m_hSocket, magicP, 102, 0, (struct sockaddr *)&addr, sizeof(addr));
+	
+	wakeupUdp.Send(magicP, 102);
 }
 void ofxMacPowControl::powOff(string ip)
 {
@@ -75,11 +48,11 @@ void ofxMacPowControl::powOff(string ip)
 
 	static const string msg = "shutdown";
 
-	udpConnection.Connect(ip.c_str(), 1000);
-	udpConnection.Send(msg.c_str(), msg.length());
+	shutdownUdp.Connect(ip.c_str(), 1000);
+	shutdownUdp.Send(msg.c_str(), msg.length());
 
 	Sleep(100);
 
-	udpConnection.Connect(ip.c_str(), 30801);
-	udpConnection.Send(msg.c_str(), msg.length());
+	shutdownUdp.Connect(ip.c_str(), 30801);
+	shutdownUdp.Send(msg.c_str(), msg.length());
 }

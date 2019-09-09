@@ -6,6 +6,7 @@
 /* file describe:主机网络唤醒
 /* date:2017.7.16
 /* author:hui
+/* update:2019.7.18(优化)
 /************************************************************************/
 class ofxMacPowControl
 {
@@ -18,8 +19,8 @@ public:
 	void powOff(string ip);
 
 private:
-	struct sockaddr_in addr;
-	SOCKET m_hSocket;
-	ofxUDPManager udpConnection;
+	ofxUDPManager shutdownUdp;
+
+	ofxUDPManager wakeupUdp;
 };
 

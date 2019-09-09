@@ -1,6 +1,6 @@
-#include "ofxProjectorBlend.h"
+#include "ofxProjectorBlend2.h"
 
-string fragmentShader = "#extension GL_ARB_texture_rectangle : enable\n \
+string fragmentShader2 = "#extension GL_ARB_texture_rectangle : enable\n \
 						\
 						uniform sampler2DRect Tex0;\
 						\
@@ -166,7 +166,7 @@ string fragmentShader = "#extension GL_ARB_texture_rectangle : enable\n \
 						:	drawSmoothEdges(overlap, blankout, SolidEdgeColor);\
 						}";
 
-ofxProjectorBlend::ofxProjectorBlend()
+ofxProjectorBlend2::ofxProjectorBlend2()
 {
 	showBlend = true;
 
@@ -175,18 +175,24 @@ ofxProjectorBlend::ofxProjectorBlend()
 	gammaB = gammaB2 = 0.5;
 	blendPower = blendPower2 = 1;
 	luminance = luminance2 = 0;
-	numProjectors = 0;
 	threshold = 0;
 	shaderLocation = "SmoothEdgeBlend";
 
+	horNumProjectors = 0;
+	verNumProjectors = 0;
 }
 
-void ofxProjectorBlend::setShaderLocation(string _shaderLocation){
+
+ofxProjectorBlend2::~ofxProjectorBlend2()
+{
+}
+
+void ofxProjectorBlend2::setShaderLocation(string _shaderLocation) {
 	shaderLocation = _shaderLocation;
 	//blendShader.load(shaderLocation);
-	
+
 	bool res = true;
-	res &= blendShader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader);
+	res &= blendShader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader2);
 	res &= blendShader.linkProgram();
 
 	if (!res)
@@ -195,222 +201,207 @@ void ofxProjectorBlend::setShaderLocation(string _shaderLocation){
 	}
 }
 
-void ofxProjectorBlend::setup(int resolutionWidth, 
-							  int resolutionHeight, 
-							  int _numProjectors, 
-							  int _pixelOverlap, 
-							  ofxProjectorBlendLayout _layout)
+void  ofxProjectorBlend2::setup(int _resolutionWidth, int _resolutionHeight,
+	int _horNumProjectors, int _horPixelOverlap, int _verNumPorjectors, int _verPixelOverlap)
 {
-	numProjectors = _numProjectors;
-	layout = _layout;
+	horNumProjectors = _horNumProjectors;
+	horPixelOverlap = _horPixelOverlap;
 
-	string l = "horizontal";
-	if(layout==ofxProjectorBlend_Vertical)
-		l = "vertical";
-	ofLog(OF_LOG_NOTICE, "ofxProjectorBlend: res: %d x %d * %d, overlap: %d pixels, layout: %s\n", resolutionWidth, resolutionHeight, _numProjectors, _pixelOverlap, l.c_str());
+	verNumProjectors = _verNumPorjectors;
+	verPixelOverlap = _verPixelOverlap;
+
+	totalProjectors = horNumProjectors * verNumProjectors;
+
+	singleChannelWidth = _resolutionWidth;
+	singleChannelHeight = _resolutionHeight;
+
+	ofLog(OF_LOG_NOTICE, "ofxProjectorBlend: res: %d x %d * %d x %d, horOverlap: %d, verOverlap: %d \n", 
+		(int)singleChannelWidth, horNumProjectors, (int)singleChannelHeight,verNumProjectors, (int)horPixelOverlap, (int)verPixelOverlap);
+
 	
-	if(numProjectors <= 0)
+	if (horNumProjectors <= 0 || verNumProjectors <= 0)
 	{
-		ofLog(OF_LOG_ERROR, "Cannot initialize with " + ofToString(this->numProjectors) + " projectors.");
-		return;
-	}
-	
-	pixelOverlap = _pixelOverlap;
-	
-	singleChannelWidth = resolutionWidth;
-	singleChannelHeight = resolutionHeight;
-
-	if(layout == ofxProjectorBlend_Vertical)
-	{
-		fullTextureWidth = singleChannelWidth;
-		fullTextureHeight = singleChannelHeight*numProjectors - (numProjectors-1)*pixelOverlap;
-
-		displayWidth = resolutionWidth;
-		displayHeight = resolutionHeight*numProjectors;
-	}
-	else if(layout == ofxProjectorBlend_Horizontal)
-	{
-		fullTextureWidth = singleChannelWidth*numProjectors - (numProjectors-1)*pixelOverlap;
-		fullTextureHeight = singleChannelHeight;
-
-		displayWidth = resolutionWidth*numProjectors;
-		displayHeight = resolutionHeight;
-	}
-	else
-	{
-		ofLog(OF_LOG_ERROR, "ofxProjectorBlend: You have used an invalid ofxProjectorBlendLayout in ofxProjectorBlend::setup()");
+		ofLog(OF_LOG_ERROR, "Cannot initialize with " + ofToString(this->horNumProjectors) + "*" + ofToString(verNumProjectors) + " projectors.");
 		return;
 	}
 
-	ofLog(OF_LOG_NOTICE,"canvas res: %d  x  %d",fullTextureWidth,fullTextureHeight);
+	fullTextureWidth = singleChannelWidth * horNumProjectors - (horNumProjectors - 1)* horPixelOverlap;
+	fullTextureHeight = singleChannelHeight * verNumProjectors - (verNumProjectors - 1)* verPixelOverlap;
 
-	overLapFlags.resize(numProjectors);
-	for (int i = 0;i < overLapFlags.size();i++)
+	displayWidth = singleChannelWidth * horNumProjectors;
+	displayHeight = singleChannelHeight * verNumProjectors;
+
+
+	ofLog(OF_LOG_NOTICE, "canvas res: %d  x  %d", (int)fullTextureWidth, (int)fullTextureHeight);
+
+	overLapFlags.resize(horNumProjectors * verNumProjectors);
+	for (int i = 0; i < overLapFlags.size(); i++)
 	{
 		overLapFlags[i].isLeftOverLap = false;
 		overLapFlags[i].isRightOverLap = false;
 		overLapFlags[i].isTopOverLap = false;
 		overLapFlags[i].isBottomOverLap = false;
 	}
-	
+
 	fullTexture.allocate(fullTextureWidth, fullTextureHeight, GL_RGB, 4);
 	//blendShader.load(shaderLocation);
-	blendShader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader);
+	blendShader.setupShaderFromSource(GL_FRAGMENT_SHADER, fragmentShader2);
 	blendShader.linkProgram();
 }
 
-void ofxProjectorBlend::begin() {	
+void ofxProjectorBlend2::begin() {
 	fullTexture.begin();
-	
+
 	ofPushStyle();
-	ofClear(0,0,0,0);
+	ofClear(0, 0, 0, 0);
 }
 
-float ofxProjectorBlend::getDisplayWidth() {
+void ofxProjectorBlend2::end() {
+	fullTexture.end();
+
+	ofPopStyle();
+}
+
+float ofxProjectorBlend2::getDisplayWidth() {
 	return displayWidth;
 }
 
-float ofxProjectorBlend::getDisplayHeight() {
+float ofxProjectorBlend2::getDisplayHeight() {
 	return displayHeight;
 }
 
-void ofxProjectorBlend::setWindowToDisplaySize() {
+void ofxProjectorBlend2::setWindowToDisplaySize() {
 	ofSetWindowShape(getDisplayWidth(), getDisplayHeight());
 }
 
-void ofxProjectorBlend::setPixelOverlap(float layoutlength)
+void ofxProjectorBlend2::setHorPixelOverlap(float layoutlength)
 {
-	pixelOverlap = layoutlength;
+	horPixelOverlap = layoutlength;
 
-	if(layout == ofxProjectorBlend_Vertical)
-	{
-		fullTextureWidth = singleChannelWidth;
-		fullTextureHeight = singleChannelHeight*numProjectors - (numProjectors-1)*pixelOverlap;
-	}
-	else if(layout == ofxProjectorBlend_Horizontal)
-	{
-		fullTextureWidth = singleChannelWidth*numProjectors - (numProjectors-1)*pixelOverlap;
-		fullTextureHeight = singleChannelHeight;
-	}
+	fullTextureWidth = singleChannelWidth * horNumProjectors - (horNumProjectors - 1)* horPixelOverlap;
 
 	fullTexture.allocate(fullTextureWidth, fullTextureHeight, GL_RGB, 4);
 }
 
-void ofxProjectorBlend::setLeftOverLapFlag(int _index, bool _flag)
+void ofxProjectorBlend2::setVerPixelOverlap(float layoutlength)
 {
-	if (_index >= 0 && _index < numProjectors)
+	verPixelOverlap = layoutlength;
+
+	fullTextureHeight = singleChannelHeight * verNumProjectors - (verNumProjectors - 1)* verPixelOverlap;
+
+	fullTexture.allocate(fullTextureWidth, fullTextureHeight, GL_RGB, 4);
+}
+
+void ofxProjectorBlend2::setLeftOverLapFlag(int _index, bool _flag)
+{
+	if (_index >= 0 && _index < overLapFlags.size())
 	{
 		overLapFlags[_index].isLeftOverLap = _flag;
 	}
 }
 
-void ofxProjectorBlend::setRightOverLapFlag(int _index, bool _flag)
+void ofxProjectorBlend2::setRightOverLapFlag(int _index, bool _flag)
 {
-	if (_index >= 0 && _index < numProjectors)
+	if (_index >= 0 && _index < overLapFlags.size())
 	{
 		overLapFlags[_index].isRightOverLap = _flag;
 	}
 }
 
-void ofxProjectorBlend::setTopOverLapFlag(int _index, bool _flag)
+void ofxProjectorBlend2::setTopOverLapFlag(int _index, bool _flag)
 {
-	if (_index >= 0 && _index < numProjectors)
+	if (_index >= 0 && _index < overLapFlags.size())
 	{
 		overLapFlags[_index].isTopOverLap = _flag;
 	}
 }
 
-void ofxProjectorBlend::setBottomOverLapFlag(int _index, bool _flag)
+void ofxProjectorBlend2::setBottomOverLapFlag(int _index, bool _flag)
 {
-	if (_index >= 0 && _index < numProjectors)
+	if (_index >= 0 && _index < overLapFlags.size())
 	{
 		overLapFlags[_index].isBottomOverLap = _flag;
 	}
 }
 
-float ofxProjectorBlend::getCanvasWidth()
+float ofxProjectorBlend2::getCanvasWidth()
 {
 	return fullTextureWidth;
 }
 
-float ofxProjectorBlend::getCanvasHeight()
+float ofxProjectorBlend2::getCanvasHeight()
 {
 	return fullTextureHeight;
 }
 
-void ofxProjectorBlend::end() {
-	fullTexture.end();
-		
-	ofPopStyle();
-}
+void ofxProjectorBlend2::updateShaderUniforms() {
 
-void ofxProjectorBlend::updateShaderUniforms() {
-	
 	blendShader.setUniform1f("OverlapTop", 0.0f);
 	blendShader.setUniform1f("OverlapLeft", 0.0f);
 	blendShader.setUniform1f("OverlapBottom", 0.0f);
 	blendShader.setUniform1f("OverlapRight", 0.0f);
-	
+
 	blendShader.setUniform1f("BlendPower", blendPower);
 	blendShader.setUniform1f("SomeLuminanceControl", luminance);
 	blendShader.setUniform3f("GammaCorrection", gammaR, gammaG, gammaB);
-	
+
 	blendShader.setUniform1f("BlendPower2", blendPower2);
 	blendShader.setUniform1f("SomeLuminanceControl2", luminance2);
 	blendShader.setUniform3f("GammaCorrection2", gammaR2, gammaG2, gammaB2);
-	
-	blendShader.setUniform1f("projectors", this->numProjectors);
+
+	blendShader.setUniform1f("projectors", totalProjectors);
 	blendShader.setUniform1f("threshold", threshold);
 }
 
-void ofxProjectorBlend::draw(float x, float y) {
-	//ofSetHexColor(0xFFFFFF);
+void ofxProjectorBlend2::draw(float x, float y) {
+	
 	glPushMatrix();
 	glTranslatef(x, y, 0);
-	if(showBlend)
+	if (showBlend)
 	{
 
 		blendShader.begin();
 		blendShader.setUniform1f("width", singleChannelWidth);
 		blendShader.setUniform1f("height", singleChannelHeight);
-		
+
 		updateShaderUniforms();
-		
+
 		blendShader.setUniformTexture("Tex0", fullTexture.getTexture(), 0);
-		
+
 		ofVec2f offset(0, 0);
 		glPushMatrix();
-		
+
 		// loop through each projector and glTranslatef() to its position and draw.
-		for(int i = 0; i < numProjectors; i++)
+		for (int i = 0; i < totalProjectors; i++)
 		{
+			glPushMatrix();
+			int horIndex = i % horNumProjectors;
+			int verIndex = i / horNumProjectors;
+
+			//ÎÆÀíÆ«ÒÆ
+			offset.x = (singleChannelWidth - horPixelOverlap) * horIndex;
+			offset.y = (singleChannelHeight - verPixelOverlap) * verIndex;
+
+			//»æÖÆÆ«ÒÆ
+			glTranslatef(singleChannelWidth * horIndex, singleChannelHeight * verIndex, 0);
+
 			blendShader.setUniform2f("texCoordOffset", offset.x, offset.y);
-			
-			blendShader.setUniform1f("OverlapTop", overLapFlags[i].isBottomOverLap?pixelOverlap:0.0f);
-			blendShader.setUniform1f("OverlapLeft", overLapFlags[i].isLeftOverLap ? pixelOverlap : 0.0f);
-			blendShader.setUniform1f("OverlapBottom", overLapFlags[i].isTopOverLap ? pixelOverlap : 0.0f);
-			blendShader.setUniform1f("OverlapRight", overLapFlags[i].isRightOverLap ? pixelOverlap : 0.0f);
-			
+
+			blendShader.setUniform1f("OverlapTop", overLapFlags[i].isBottomOverLap ? verPixelOverlap : 0.0f);
+			blendShader.setUniform1f("OverlapLeft", overLapFlags[i].isLeftOverLap ? horPixelOverlap : 0.0f);
+			blendShader.setUniform1f("OverlapBottom", overLapFlags[i].isTopOverLap ? verPixelOverlap : 0.0f);
+			blendShader.setUniform1f("OverlapRight", overLapFlags[i].isRightOverLap ? horPixelOverlap : 0.0f);
+
 			glBegin(GL_QUADS);
 			glTexCoord2f(0, 0);                                    glVertex2f(0, 0);
 			glTexCoord2f(singleChannelWidth, 0);                   glVertex2f(singleChannelWidth, 0);
 			glTexCoord2f(singleChannelWidth, singleChannelHeight); glVertex2f(singleChannelWidth, singleChannelHeight);
 			glTexCoord2f(0, singleChannelHeight);                  glVertex2f(0, singleChannelHeight);
 			glEnd();
-			
-			// move the texture offset and where we're drawing to.
-			if(layout == ofxProjectorBlend_Horizontal)
-				offset.x += singleChannelWidth - pixelOverlap;
-			else
-				offset.y += singleChannelHeight - pixelOverlap;
-			
-			if(layout == ofxProjectorBlend_Horizontal)
-				glTranslatef(singleChannelWidth, 0, 0);
-			else
-				glTranslatef(0, singleChannelHeight, 0);
+			glPopMatrix();
 		}
 		glPopMatrix();
-	
+
 		blendShader.end();
 	}
 	else
@@ -419,10 +410,12 @@ void ofxProjectorBlend::draw(float x, float y) {
 	}
 
 	//Ïû³ý¾â³Ý
+	ofPushStyle();
 	ofNoFill();
 	ofSetColor(0, 0, 0);
-	ofDrawRectangle(1, 1, displayWidth-1, displayHeight-1);
+	ofDrawRectangle(1, 1, displayWidth - 1, displayHeight - 1);
 	ofSetColor(255, 255, 255);
+	ofPopStyle();
 
 	glPopMatrix();
 }

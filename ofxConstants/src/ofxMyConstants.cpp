@@ -26,3 +26,18 @@ void ofScreenCrossTopmost(int _w, int _h)
 	SetWindowLong(thiswnd, -16, 0x800000);
 	SetWindowPos(thiswnd, HWND_TOPMOST, -1, -1, _w + 2, _h + 2, 0x40);
 }
+
+void ofNoWindow()
+{
+	//¥∞ø⁄…Ë÷√
+// 	HWND thiswnd;
+// 	thiswnd = ofGetWin32Window();
+// 	SetWindowLong(thiswnd, -16, 0x800000);
+// 	SetWindowPos(thiswnd, HWND_BOTTOM, -10000, -10000, 1,1, 0x40);
+// 	ShowWindow(thiswnd, SW_HIDE);
+
+	HWND thiswnd;
+	thiswnd = ofGetWin32Window();
+	ShowWindow(thiswnd, SW_HIDE);
+	UpdateWindow(thiswnd);
+}

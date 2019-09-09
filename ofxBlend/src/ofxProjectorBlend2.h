@@ -1,13 +1,5 @@
-#ifndef OFX_PROJECTOR_BLEND
-#define OFX_PROJECTOR_BLEND
-
+#pragma once
 #include "ofMain.h"
-
-enum ofxProjectorBlendLayout
-{
-	ofxProjectorBlend_Horizontal,
-	ofxProjectorBlend_Vertical,
-};
 
 struct overLapData
 {
@@ -17,39 +9,42 @@ struct overLapData
 	bool isBottomOverLap;
 };
 
-class ofxProjectorBlend
+class ofxProjectorBlend2
 {
-  public:
-	ofxProjectorBlend();
-	
-	void setup(int resolutionWidth, int resolutionHeight, int numProjectors, int pixelOverlap, 
-			   ofxProjectorBlendLayout layout = ofxProjectorBlend_Horizontal);
-	
+public:
+	ofxProjectorBlend2();
+	~ofxProjectorBlend2();
+
+
+	void setup(int _resolutionWidth, int _resolutionHeight, 
+		int _horNumProjectors, int _horPixelOverlap,int _verNumPorjectors,int _verPixelOverlap);
+
 	void begin();
 	void end();
 	void draw(float x = 0, float y = 0);
-	
-	
+
+
 	float getCanvasWidth();
 	float getCanvasHeight();
 	ofFbo & getFullTexture() { return fullTexture; }
 	void setShaderLocation(string shaderLocation);
-	
+
 	float getDisplayWidth();
 	float getDisplayHeight();
-	
+
 	void setWindowToDisplaySize();
-	void setPixelOverlap(float layoutlength);
+	void setHorPixelOverlap(float layoutlength);
+	void setVerPixelOverlap(float layoutlength);
 
 	void setLeftOverLapFlag(int _index, bool _flag);
 	void setRightOverLapFlag(int _index, bool _flag);
 	void setTopOverLapFlag(int _index, bool _flag);
 	void setBottomOverLapFlag(int _index, bool _flag);
 
-	
-	
+
+
 	bool showBlend;
-	
+
 	float blendPower;
 	float gammaR;
 	float gammaG;
@@ -61,11 +56,11 @@ class ofxProjectorBlend
 	float gammaB2;
 	float luminance2;
 	float threshold;
-	
-//protected:
-	
+
+	//protected:
+
 	string shaderLocation;
-	
+
 	float fullTextureWidth;
 	float fullTextureHeight;
 	float singleChannelWidth;
@@ -73,16 +68,19 @@ class ofxProjectorBlend
 
 	float displayWidth;
 	float displayHeight;
-	
-	float pixelOverlap;
-	
-	int numProjectors;
+
+	//float pixelOverlap;
+	float horPixelOverlap;
+	float verPixelOverlap;
+
+	//int numProjectors;
+	int horNumProjectors;
+	int verNumProjectors;
+	int totalProjectors;
 	vector<overLapData> overLapFlags;
 
-	ofxProjectorBlendLayout layout;
 	ofShader blendShader;
 	ofFbo fullTexture;
 	void updateShaderUniforms();
 };
 
-#endif

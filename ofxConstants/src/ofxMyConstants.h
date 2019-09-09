@@ -16,5 +16,7 @@ void ofDrawDemoStr();
 void ofMyCmdSendSleep();							//指令发送间隔等待
 
 void ofScreenCrossTopmost(int _w,int _h);			//画面跨屏置顶
+
+void ofNoWindow();									//不显示界面
 //#define LOCAL_DEBUG 0
 

@@ -97,7 +97,7 @@ void secondTipPage::mouseReleased(int x, int y)
 			if (i == BTN_OK)
 			{
 				orderHandler::getInstance().handleOrder(order);
-			//	touchBtn->sleep();
+				//touchBtn->sleep();
 			}
 			bActive = false;
 		}

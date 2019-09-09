@@ -40,6 +40,7 @@ public:
 
 	static void setSleepTimeLen(float _timeLen);
 	static void setBtnColor(ofColor _color);
+	static void setBtnFontSize(int _size);
 private:
 	string wordStr;
 	ofImage wordImg;
@@ -54,6 +55,7 @@ private:
 	BTN_TYPE btnType;
 	static void init();
 	static ofxTrueTypeFontUC font;
+	static int fontSize;
 	ofRectangle stringRect;
 	static ofImage blueLargeImg;
 	static ofImage redLargeImg;

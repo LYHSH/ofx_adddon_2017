@@ -569,14 +569,22 @@ void videoPlayer::init()
 
 	bIsTesting = false;
 
-	xml.loadFile(settingFileStr);
+	{
+		bool loadSucess = xml.loadFile(settingFileStr);
 
-	bIsLooping = xml.getValue("loop",1);
-	volume = xml.getValue("volume",150);
-	bUseBack = xml.getValue("back",0);
-	bRemoteControl = xml.getValue("remoteControl",1);
-	bMute = xml.getValue("bMute",0);
-	isActive = xml.getValue("active", 1);
+		bIsLooping = xml.getValue("loop", 1);
+		volume = xml.getValue("volume", 255);
+		bUseBack = xml.getValue("back", 0);
+		bRemoteControl = xml.getValue("remoteControl", 1);
+		bMute = xml.getValue("bMute", 0);
+		isActive = xml.getValue("active", 1);
+
+		if (!loadSucess)
+		{
+			saveSetting(settingFileStr);
+		}
+	}
+	
 
 
 	ofDirectory videoDIR;
@@ -643,9 +651,6 @@ void videoPlayer::saveSetting(string _filename)
 	settingXml.addValue("loop", bIsLooping);
 	settingXml.addValue("volume", volume);
 	settingXml.addValue("back", bUseBack);
-	settingXml.addValue("remoteControl", bRemoteControl);
-	settingXml.addValue("bMute", bMute);
-
 	settingXml.save(_filename);
 }
 
@@ -788,22 +793,38 @@ void videoPlayer::setLoop(bool _bLoop)
 void videoPlayer::loadNotifySetting()
 {
 	ofxXmlSettings xml;
-	xml.load("message.xml");
+	bool loadSucess = xml.load("message.xml");
 
-	notifyPort = xml.getValue("MESSAGE_PORT", 10001);
+	notifyPort = xml.getValue("MESSAGE_PORT", 15999);
 
 	int ipNums = xml.getNumTags("MESSAGE_IP");
 	notifyIps.resize(ipNums);
 	for (int i = 0; i < notifyIps.size(); i++)
 	{
-		notifyIps[i] = xml.getValue("MESSAGE_IP", "192.168.1.100");
+		notifyIps[i] = xml.getValue("MESSAGE_IP", "127.0.0.1");
 	}
 
-	notifyMessages[VIDEO_PLAY] = xml.getValue("MESSAGE_VIDEO_PLAY","");
-	notifyMessages[VIDEO_PAUSE] = xml.getValue("MESSAGE_VIDEO_PAUSE", "");
-	notifyMessages[VIDEO_STOP] = xml.getValue("MESSAGE_VIDEO_STOP", "");
-	notifyMessages[VIDEO_MUTE] = xml.getValue("MESSAGE_VIDEO_MUTE", "");
-	notifyMessages[VIDEO_UN_MUTE] = xml.getValue("MESSAGE_VIDEO_UN_MUTE", "");
+	notifyMessages[VIDEO_PLAY] = xml.getValue("MESSAGE_VIDEO_PLAY","PLAY");
+	notifyMessages[VIDEO_PAUSE] = xml.getValue("MESSAGE_VIDEO_PAUSE", "PAUSE");
+	notifyMessages[VIDEO_STOP] = xml.getValue("MESSAGE_VIDEO_STOP", "STOP");
+	notifyMessages[VIDEO_MUTE] = xml.getValue("MESSAGE_VIDEO_MUTE", "MUTE");
+	notifyMessages[VIDEO_UN_MUTE] = xml.getValue("MESSAGE_VIDEO_UN_MUTE", "UNMUTE");
+
+	if (!loadSucess)
+	{
+		xml.clear();
+		xml.addValue("MESSAGE_PORT", 15999);
+
+		xml.addValue("MESSAGE_IP", "127.0.0.1");
+
+		xml.addValue("MESSAGE_VIDEO_PLAY", notifyMessages[VIDEO_PLAY]);
+		xml.addValue("MESSAGE_VIDEO_PAUSE", notifyMessages[VIDEO_PAUSE]);
+		xml.addValue("MESSAGE_VIDEO_STOP", notifyMessages[VIDEO_STOP]);
+		xml.addValue("MESSAGE_VIDEO_MUTE", notifyMessages[VIDEO_MUTE]);
+		xml.addValue("MESSAGE_VIDEO_UN_MUTE", notifyMessages[VIDEO_UN_MUTE]);
+
+		xml.save("message.xml");
+	}
 }
 
 #ifdef TIMELINE_MESSAGE_NOTIFY
@@ -850,7 +871,7 @@ void videoPlayer::sendUdpMsg(string _ip, int _port, string _msg)
 void videoPlayer::loadTimeLineSetting()
 {
 	ofxXmlSettings xml;
-	xml.load("timeline.xml");
+	bool loadSucess = xml.load("timeline.xml");
 
 	int nums = xml.getNumTags("NODE");
 
@@ -866,6 +887,20 @@ void videoPlayer::loadTimeLineSetting()
 		xml.popTag();
 
 		timeLineNodes.push_back(node);
+	}
+
+	if (!loadSucess)
+	{
+		xml.clear();
+		xml.addTag("NODE");
+		xml.pushTag("NODE");
+		xml.addValue("TIME", 0.0f);
+		xml.addValue("IP", "127.0.0.1");
+		xml.addValue("PORT", 8888);
+		xml.addValue("MESSAGE", "");
+		xml.popTag();
+
+		xml.save("timeline.xml");
 	}
 }
 
@@ -923,9 +958,16 @@ void videoPlayer::videoRewind()
 void videoPlayer::loadVideoMoveSetting(string _filename /* = "videoMoveSetting.xml" */)
 {
 	ofxXmlSettings xml;
-	xml.load(_filename);
+	bool loadSucess = xml.load(_filename);
 
 	videoMoveStep = xml.getValue("step", 5);
+
+	if (!loadSucess)
+	{
+		xml.clear();
+		xml.addValue("step", videoMoveStep);
+		xml.save(_filename);
+	}
 }
 #pragma endregion ¿ì½ø¿ìÍË
 
