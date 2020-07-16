@@ -79,7 +79,7 @@ TuioClient::TuioClient(int port)
 , connected   (false)
 {
 	try {
-		socket = new UdpListeningReceiveSocket(IpEndpointName( IpEndpointName::ANY_ADDRESS, port ), this, true );
+		socket = new UdpListeningReceiveSocket(IpEndpointName( IpEndpointName::ANY_ADDRESS, port ), this );
 	} catch (std::exception &e) { 
 		std::cerr << "could not bind to UDP port " << port << std::endl;
 		socket = NULL;

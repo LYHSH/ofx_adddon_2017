@@ -55,3 +55,8 @@ void ofxSerialDataSender::close()
 {
 	serial.close();
 }
+
+ofxSerial * ofxSerialDataSender::getSerial()
+{
+	return &serial;
+}

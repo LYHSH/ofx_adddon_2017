@@ -19,6 +19,8 @@ public:
 	int recvData(char * _data, int _size) override final;
 
 	void close() override final;
+
+	ofxSerial * getSerial();
 private:
 	ofxSerial serial;
 	string portName;

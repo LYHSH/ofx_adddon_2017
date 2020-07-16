@@ -42,6 +42,10 @@ void videoPlayer::setup(string _dir /* = "video/" */,string _settingFile /* = "s
 	loadVideoMoveSetting();
 
 	isStoping = false;
+
+#ifdef OFX_AV_VIDEO_PLAYER
+	soundStream.setup(ofGetAppPtr(), 2, 0, 44100, 512, 4);
+#endif
 }
 
 void videoPlayer::update()

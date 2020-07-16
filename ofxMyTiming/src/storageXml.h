@@ -28,6 +28,11 @@ public:
 	bool getLight(int _frame,mylight & _object);
 
 	void reset();
+
+	int size()const;
+	bool getLightByIndex(int _index,mylight & _object);
+
+	const vector<int> & getAllId();
 private:
 	
 	void readSetting(vector<mylight> & _object,string _xmlFile);
@@ -35,5 +40,8 @@ private:
  	vector<mylight> lights;
 	int lastFrame;
 
+
+	map<int, bool> allLightIds;
+	vector<int> allIds;
 };
 

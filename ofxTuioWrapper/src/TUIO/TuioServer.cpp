@@ -20,7 +20,10 @@
 */
 
 #include "TuioServer.h"
-//#include "unistd.h"				//已被windwo其他文件代替，此处可以删去，原作者忘记删掉了.....
+
+#ifndef WIN32
+#include "unistd.h"
+#endif
 
 using namespace TUIO;
 using namespace osc;

@@ -4,6 +4,7 @@
 
 ofxRelayLoopMgr::ofxRelayLoopMgr()
 {
+	relayConfigStr = "control/light.xml";
 }
 
 
@@ -29,6 +30,12 @@ void ofxRelayLoopMgr::setup()
 	}
 }
 
+void ofxRelayLoopMgr::setup(string _file)
+{
+	relayConfigStr = _file;
+	setup();
+}
+
 void ofxRelayLoopMgr::setOn(int _id)
 {
 	if (!checkOut(_id))return;
@@ -45,19 +52,42 @@ void ofxRelayLoopMgr::setOff(int _id)
 
 void ofxRelayLoopMgr::setAllOn()
 {
-	for (int i = 0; i < lightIndexs.size(); i++)
+	for (unsigned int i = 0; i < lightIndexs.size(); i++)
 	{
 		onOffLight(lightIndexs[i], bReverse ? false : true,i);
-		ofMyCmdSendSleep();
+		sleep();
 	}
 }
 
 void ofxRelayLoopMgr::setAllOff()
 {
-	for (int i = 0; i < lightIndexs.size(); i++)
+	for (unsigned int i = 0; i < lightIndexs.size(); i++)
 	{
 		onOffLight(lightIndexs[i], !bReverse ? false : true,i);
-		ofMyCmdSendSleep();
+		sleep();
+	}
+}
+
+void ofxRelayLoopMgr::setRealAllOn()
+{
+	
+	for (decltype(relayMgr.size()) i = 0;i < relayMgr.size();i++)
+	{
+		relayMgr.begin(i);
+		relayMgr.setAllOn();
+		sleep();
+		relayMgr.end();
+	}
+}
+
+void ofxRelayLoopMgr::setRealAllOff()
+{
+	for (decltype(relayMgr.size()) i = 0; i < relayMgr.size(); i++)
+	{
+		relayMgr.begin(i);
+		relayMgr.setAllOff();
+		sleep();
+		relayMgr.end();
 	}
 }
 
@@ -72,7 +102,7 @@ bool ofxRelayLoopMgr::isOn(int _id)
 	return onOffs[_id];
 }
 
-bool ofxRelayLoopMgr::checkOut(int _index)const
+bool ofxRelayLoopMgr::checkOut(size_t _index)const
 {
 	bool res = true;
 	res &= _index >= 0;
@@ -83,7 +113,9 @@ bool ofxRelayLoopMgr::checkOut(int _index)const
 void ofxRelayLoopMgr::loadLightSetting()
 {
 	ofxXmlSettings xml;
-	xml.load("control/light.xml");
+	xml.load(relayConfigStr);
+
+	
 
 	int nums = xml.getNumTags("light");
 
@@ -122,7 +154,7 @@ void ofxRelayLoopMgr::onOffLight(const vector<lightNode> & _indexs, bool _state,
 			relayMgr.begin(node.relayIndex);
 			relayMgr.setOn(node.loopIndex);
 			relayMgr.end();
-			ofMyCmdSendSleep();
+			sleep();
 		}
 
 		if (-1 != index)
@@ -138,7 +170,7 @@ void ofxRelayLoopMgr::onOffLight(const vector<lightNode> & _indexs, bool _state,
 			relayMgr.begin(node.relayIndex);
 			relayMgr.setOff(node.loopIndex);
 			relayMgr.end();
-			ofMyCmdSendSleep();
+			sleep();
 		}
 
 		if (-1 != index)
@@ -148,4 +180,9 @@ void ofxRelayLoopMgr::onOffLight(const vector<lightNode> & _indexs, bool _state,
 	}
 
 	relayMgr.end();
+}
+
+void ofxRelayLoopMgr::sleep()
+{
+	ofSleepMillis(100);
 }

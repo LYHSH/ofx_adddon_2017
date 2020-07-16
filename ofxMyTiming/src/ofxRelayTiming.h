@@ -12,12 +12,15 @@ public:
 	void draw();
 
 	void reset();
-	void setResetOrder(int _value);
+	void setAllOn();
+	void setAllOff();
 private:
 
 	ofxRelaysMgr mgr;
 	ofxRelaysBase * relayer;
 
 	vector<storageXml> timingDatas;
+
+	vector<int> ids;
 };
 

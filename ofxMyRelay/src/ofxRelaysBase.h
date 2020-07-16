@@ -1,6 +1,5 @@
 #pragma once
 #include "ofMain.h"
-#include "ofxMyConstants.h"
 /************************************************************************/
 /* project name:继电器控制接口库
 /* file describe:继电器控制基类   

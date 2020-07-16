@@ -44,21 +44,6 @@ TuioObject * ofxTuioServer::addObject(int _sid, float _x, float _y, float _a){
 	return tuioServer->addTuioObject(_sid, _x/ofGetWidth(), _y/ofGetHeight(), _a);
 }
 
-TuioObject * ofxTuioServer::getTuioObject(int _sid)
-{
-	return tuioServer->getTuioObject(_sid);
-}
-
-std::list<TuioObject*> ofxTuioServer::getTuioObjects()
-{
-	return tuioServer->getTuioObjects();
-}
-
-TuioCursor * ofxTuioServer::getTuioCursor(int _sid)
-{
-	return tuioServer->getTuioCursor(_sid);
-}
-
 //update them
 void ofxTuioServer::updateCursor(TuioCursor * _tcur, float _nx, float _ny){
 	if(verbose) cout<<"ofxTuioServer: update TUIO Cursor " << _tcur->getCursorID() << " to x: "+ofToString(_nx)+" y: "+ofToString(_ny)<<endl;
@@ -108,7 +93,6 @@ void ofxTuioServer::run() {
 
 //draw them for debug purposes
 void ofxTuioServer::drawCursors() {
-	char id[3];
 	// draw the cursors
 	std::list<TuioCursor*> cursorList = tuioServer->getTuioCursors();
 	for (std::list<TuioCursor*>::iterator tuioCursor = cursorList.begin(); tuioCursor!=cursorList.end(); tuioCursor++) {
@@ -129,7 +113,7 @@ void ofxTuioServer::drawCursors() {
 
 			// draw the finger tip
 			glColor3f(0.0, 0.75, 0.75);
-			ofCircle(tcur->getX()*ofGetWidth(), tcur->getY()*ofGetHeight(), 10);
+			ofDrawCircle(tcur->getX()*ofGetWidth(), tcur->getY()*ofGetHeight(), 10);
 		}
 	}
 }
@@ -144,9 +128,9 @@ void ofxTuioServer::drawObjects(){
 		glPushMatrix();
 		glTranslatef(obj->getX()*ofGetWidth(), obj->getY()*ofGetHeight(), 0.0);
 		glRotatef(obj->getAngleDegrees(), 0.0, 0.0, 1.0);
-		ofRect(-10.0, -10.0, 20.0, 20.0);
+		ofDrawRectangle(-10.0, -10.0, 20.0, 20.0);
 		glColor3f(1.0,1.0,1.0);
-		ofLine(0, 0, 0, -10);
+		ofDrawLine(0, 0, 0, -10);
 		glPopMatrix();
 		string str = "SymbolId: "+ofToString((int)(obj->getSymbolID()));
 		ofDrawBitmapString(str, obj->getX()*ofGetWidth()-10.0, obj->getY()*ofGetHeight()+25.0);
@@ -154,4 +138,19 @@ void ofxTuioServer::drawObjects(){
 		ofDrawBitmapString(str, obj->getX()*ofGetWidth()-10.0, obj->getY()*ofGetHeight()+40.0);
 	}
 
+}
+
+TuioObject * ofxTuioServer::getTuioObject(int _sid)
+{
+	return tuioServer->getTuioObject(_sid);
+}
+
+std::list<TuioObject*> ofxTuioServer::getTuioObjects()
+{
+	return tuioServer->getTuioObjects();
+}
+
+TuioCursor * ofxTuioServer::getTuioCursor(int _sid)
+{
+	return tuioServer->getTuioCursor(_sid);
 }

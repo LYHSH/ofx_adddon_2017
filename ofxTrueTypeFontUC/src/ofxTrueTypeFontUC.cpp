@@ -536,6 +536,9 @@ ofxTrueTypeFontUC::ofxTrueTypeFontUC() {
   mImpl->binded_ = false;
   
   mImpl->limitCharactersNum_ = mImpl->kDefaultLimitCharactersNum;
+
+  anchorPercent.x = 0.0f;
+  anchorPercent.y = 0.0f;
 }
 
 //------------------------------------------------------------------
@@ -1297,3 +1300,27 @@ void ofxTrueTypeFontUC::Impl::loadChar(const int &charID) {
   #endif
 }
 
+void ofxTrueTypeFontUC::setAnchorPercent(float xPct, float yPct)
+{
+	xPct = ofClamp(xPct, 0.0f, 1.0f);
+	yPct = ofClamp(yPct, 0.0f, 1.0f);
+
+	anchorPercent.x = xPct;
+	anchorPercent.y = yPct;
+}
+
+void ofxTrueTypeFontUC::anchorDraw(const std::string &str, float x, float y)
+{
+	glm::vec2 virtualDrawPos(0,0);
+	ofRectangle virtualRect = this->getStringBoundingBox(str, virtualDrawPos.x, virtualDrawPos.y);
+
+	glm::vec2 offset = virtualDrawPos - virtualRect.getTopLeft();
+
+	glm::vec2 anchor(anchorPercent.x * virtualRect.getWidth(),anchorPercent.y * virtualRect.getHeight());
+
+	glm::vec2 realTopLeftPos(x-anchor.x,y-anchor.y);
+
+	glm::vec2 drawPos = realTopLeftPos + offset;
+
+	this->drawString(str, drawPos.x, drawPos.y);
+}

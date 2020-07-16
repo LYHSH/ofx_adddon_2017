@@ -69,7 +69,7 @@ void ofxLightingRelays::setAllOn()
 	for (int i = 0; i < MAX_LOOPS; i++)
 	{
 		setOn(i);
-		Sleep(150);
+		ofSleepMillis(150);
 	}
 #else
 	static int const DATA_LEN = 8;
@@ -102,11 +102,11 @@ void ofxLightingRelays::setAllOff()
 	for (int i = 0; i <  MAX_LOOPS; i++)
 	{
 		setOff(i);
-		Sleep(150);
+		ofSleepMillis(150);
 	}
 #else
 	static int const DATA_LEN = 8;
-	unsigned char dataCodes[DATA_LEN] = { 0x00 };
+	unsigned char dataCodes[DATA_LEN] = { 0x00 }; 
 	dataCodes[0] = getAddress();
 	dataCodes[1] = 0x06;
 	dataCodes[2] = 0x00;
@@ -140,7 +140,7 @@ void ofxLightingRelays::setMultOn(vector<int> & _ids)
 	for (int i = 0; i < _ids.size(); i++)
 	{
 		setOn(_ids[i]);
-		Sleep(10);
+		ofSleepMillis(200);
 	}
 }
 
@@ -156,7 +156,7 @@ void ofxLightingRelays::setMultOff(vector<int> & _ids)
 	for (int i = 0; i < _ids.size(); i++)
 	{
 		setOff(_ids[i]);
-		Sleep(10);
+		ofSleepMillis(200);
 	}
 }
 

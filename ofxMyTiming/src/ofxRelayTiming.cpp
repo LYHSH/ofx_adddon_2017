@@ -32,7 +32,18 @@ void ofxRelayTiming::setup(string _fileName)
 	for (int i = 0; i < timingDatas.size(); i++)
 	{
 		timingDatas[i].setup(dir.getPath(i));
+		vector<int> temp = timingDatas[i].getAllId();
+		ids.insert(ids.end(),temp.begin(),temp.end());
 	}
+
+	sort(ids.begin(), ids.end());
+	ids.erase(unique(ids.begin(), ids.end()), ids.end());
+
+	for (int i = 0;i < ids.size();i++)
+	{
+		cout << ids[i] << " " << endl;
+	}
+	cout << endl;
 #pragma endregion
 }
 
@@ -89,9 +100,29 @@ void ofxRelayTiming::reset()
 	{
 		timingDatas[i].reset();
 	}
+}
 
-	if (relayer)
+void ofxRelayTiming::setAllOn()
+{
+	for (int i = 0; i < timingDatas.size();i++)
 	{
-		relayer->setAllOff();
+		if (relayer)
+		{
+			cout << "set all on" << endl;
+			relayer->setMultOn(ids);
+		}
+	}
+	
+}
+
+void ofxRelayTiming::setAllOff()
+{
+	for (int i = 0; i < timingDatas.size(); i++)
+	{
+		if (relayer)
+		{
+			cout << "set all off" << endl;
+			relayer->setMultOff(ids);
+		}
 	}
 }

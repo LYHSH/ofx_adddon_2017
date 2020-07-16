@@ -49,8 +49,6 @@ public:
 
 	TuioCursor * getTuioCursor(int _sid);
 
-	
-
 	void updateCursor(TuioCursor * _tcur, float _nx, float _ny);
 	void updateObject(TuioObject * _tobj, float _nx, float _ny, float _ang);
 
@@ -68,11 +66,10 @@ public:
 	//This is public so you can also access all the functionality of the official TUIO c++ client that does not get wrapped!!
 	//I only wrapped the functions where screencoordinates need to be put in a range from 0 to 1 ect.
 	TuioServer * tuioServer;
+
 private:
 	bool verbose;
 	TuioTime currentTime;
-
-
 };
 
 #endif /* INCLUDED_ofxTuioServer_H */

@@ -42,6 +42,32 @@ void storageXml::reset()
 	}
 }
 
+int storageXml::size()const
+{
+	return lights.size();
+}
+
+bool storageXml::getLightByIndex(int _index, mylight & _object)
+{
+	bool flag = false;
+	for (int i = 0; i < lights.size(); i++)
+	{
+		if (i == _index)
+		{
+			flag = true;
+			_object = lights[i];
+		}
+		
+	}
+
+	return flag;
+}
+
+const vector<int> & storageXml::getAllId()
+{
+	return allIds;
+}
+
 void storageXml::readSetting(vector<mylight> & _object, string _xmlFile)
 {
 	ofxXmlSettings xml;
@@ -58,11 +84,21 @@ void storageXml::readSetting(vector<mylight> & _object, string _xmlFile)
 		vector<string> strs = ofSplitString(idstr, ",");
 		for (int j = 0; j < strs.size(); j++)
 		{
-			temp.lightId.push_back(ofToInt(strs[j]));
+			int id = ofToInt(strs[j]);
+			temp.lightId.push_back(id);
+			allLightIds[id] = true;
 		}
 
 		temp.isDone = false;
 		_object.push_back(temp);
 		xml.popTag();
 	}
+
+
+	for (auto ite = allLightIds.begin();ite != allLightIds.end();ite++)
+	{
+		allIds.push_back(ite->first);
+	}
+
+	ofLogNotice() << "all light nums:" << allIds.size();
 }

@@ -27,7 +27,7 @@ protected:
 	unsigned char GetSumVerify(int nStart, int nEnd, const unsigned char * _dataCode);
 	unsigned short CRC166(unsigned char *puchMsg, unsigned short usDataLen);
 
-	//根据二进制字符串设置数据位值
+	//通过二进制字符串设置数据位值(四个字节32位)
 	string getBinaryStr(vector<int> & _ids);
 	void setDataBit(unsigned char *_data, int _nStart, int _len, string _binaryStr);
 

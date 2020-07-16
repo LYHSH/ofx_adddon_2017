@@ -24,7 +24,18 @@ ofxRemoteVideoControlMgr::~ofxRemoteVideoControlMgr()
 void ofxRemoteVideoControlMgr::setup(const string & _filename)
 {
 	ofxXmlSettings xml;
-	xml.load(_filename);
+	bool isLoad =  xml.load(_filename);
+	if (!isLoad)
+	{
+		xml.addTag("video");
+		xml.pushTag("video", 0);
+		xml.addValue("IP", "127.0.0.1");
+		xml.popTag();
+		xml.saveFile(_filename);
+
+		return;
+	}
+
 
 	int nums = xml.getNumTags("video");
 	controler.resize(nums);

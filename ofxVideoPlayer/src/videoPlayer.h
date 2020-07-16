@@ -63,16 +63,23 @@ public:
 	virtual ~videoPlayer(void);
 	static float const STOP_POSITION;
 
+
+	//视频加载
 	void setup(string _dir = "video/",string _settingFile = "setting.xml");
+	//画面刷新
 	virtual void update();
+	//画面渲染
 	virtual void draw(float x, float y, float width, float height);
 	void draw(float x,float y);
 	void backImgDraw(float x, float y, float width, float height);
 	void centerDraw(float _centerX, float _centerY, float _screenW, float _screenH);
 	virtual void keyPressed(int key);
 
+	//播放
 	void setplay();
+	//暂停
 	void setpause();
+	//复位
 	void setstop();
 
 	void setMute();
@@ -124,6 +131,7 @@ protected:
 #endif
 #ifdef OFX_AV_VIDEO_PLAYER
 	frameSynAvServer video;
+	ofSoundStream soundStream;
 #endif
 	
 	vector<string> videoPaths;

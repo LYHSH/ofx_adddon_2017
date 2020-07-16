@@ -80,7 +80,7 @@ string ofxRealRelayBase::getBinaryStr(vector<int> & _ids)
 void ofxRealRelayBase::setDataBit(unsigned char *_data, int _nStart, int _len, string _binaryStr)
 {
 	string str;
-	int size = 8;
+	const int size = 8;//一个字节八位
 	int start = 0;
 
 	for (int i = 0; i < _len; i++)

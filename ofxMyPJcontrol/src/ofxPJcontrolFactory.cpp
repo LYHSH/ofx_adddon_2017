@@ -8,6 +8,9 @@
 #include "ofxDLPproject.h"
 #include "ofxChangShaPJ1.h"
 #include "ofxChangShaPJ2.h"
+#include "ofxTelentPj.h"
+#include "ofxCannonMU800Z.h"
+#include "ofxVivitekTom2NetProject.h"
 
 ofxPJcontrolFactory::ofxPJcontrolFactory()
 {
@@ -51,6 +54,15 @@ ofxPJcontrolBase * ofxPJcontrolFactory::createPJbyType(PROJECT_TYPE _type,string
 		break;
 	case PJ_TYPE_CS_MOON_NET_2:
 		return createCSmoonNetPJ2(_ipOrCom);
+		break;
+	case PJ_TYPE_SHE_SHAN_6D_NET_2:
+		return createSheShan6DPJ(_ipOrCom);
+		break;
+	case PJ_TYPE_CANNON_MU800Z:
+		return createMU800Z(_ipOrCom);
+		break;
+	case PJ_TYPE_VIVITEK_COM_2_NET:
+		return createVivitekCom2NetPj(_ipOrCom);
 		break;
 	default:
 		return NULL;
@@ -138,3 +150,26 @@ ofxPJcontrolBase * ofxPJcontrolFactory::createCSmoonNetPJ2(string _ip)
 	return object;
 }
 
+ofxPJcontrolBase * ofxPJcontrolFactory::createSheShan6DPJ(string _ip)
+{
+	ofxTelentPj * object = new ofxTelentPj();
+	object->setup(_ip);
+
+	return object;
+}
+
+ofxPJcontrolBase * ofxPJcontrolFactory::createMU800Z(string _ip)
+{
+	ofxCannonMU800Z * object = new ofxCannonMU800Z();
+	object->setup(_ip);
+
+	return object;
+}
+
+ofxPJcontrolBase * ofxPJcontrolFactory::createVivitekCom2NetPj(string _ip)
+{
+	ofxVivitekTom2NetProject * object = new ofxVivitekTom2NetProject();
+	object->setup(_ip);
+
+	return object;
+}

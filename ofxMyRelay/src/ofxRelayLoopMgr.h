@@ -18,6 +18,7 @@ public:
 		int loopIndex;
 	};
 
+	void setup(string _file);
 	void setup();
 	void setOn(int _id);
 	void setOff(int _id);
@@ -25,12 +26,16 @@ public:
 	void setAllOn();
 	void setAllOff();
 
+	void setRealAllOn();
+	void setRealAllOff();
+
 	int size();
 	bool isOn(int _id);
 private:
-	bool checkOut(int _index)const;			//Check out of range
+	bool checkOut(size_t _index)const;			//Check out of range
 
 	ofxRelaysMgr relayMgr;
+	string relayConfigStr;
 
 	map<int, vector<lightNode>> lightIndexs;
 	void loadLightSetting();
@@ -38,5 +43,7 @@ private:
 	bool bReverse;			//ָ�ת
 
 	vector<bool> onOffs;
+
+	void sleep();
 };
 

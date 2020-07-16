@@ -16,8 +16,15 @@ public:
 	virtual int sendData(const char *_data, int _size,bool _bPrint = true) = 0;
 	virtual int recvData(char * _data, int _size) = 0;
 	virtual void close() = 0;
+    void setDelay(bool _isDelay);
+    void SetConnectState(bool _isShort);
 
 protected:
 	void printTestData(const char *_data, int _size);
+    bool isDelay() const;
+    bool IsShortConnection() const;
+private:
+    bool m_isDelay = true;
+    bool m_isShortConnection = true;
 };
 

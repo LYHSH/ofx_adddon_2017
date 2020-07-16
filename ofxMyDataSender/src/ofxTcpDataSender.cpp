@@ -34,13 +34,21 @@ int ofxTcpDataSender::sendData(const char *_data, int _size, bool _bPrint /* = t
 
 	if (bConnected)
 	{
-		Sleep(300);				//投影机指令发送时间延迟
+        if (isDelay()) {
+            Sleep(300);				//投影机指令发送时间延迟
+        }
+		
 
 		bConnected = tcpClient.sendRawBytes(_data, _size);
 
 
-		Sleep(300);				//投影机指令发送时间延迟
-		tcpClient.close();
+        if (isDelay()) {
+            Sleep(300);				//投影机指令发送时间延迟
+        }
+        if (IsShortConnection()) {
+            tcpClient.close();      //短连接
+        }
+		
 	}
 #endif
 	
@@ -56,7 +64,10 @@ int ofxTcpDataSender::recvData(char * _data, int _size)
 
 	if (bConnected)
 	{
-		Sleep(200);
+        if (isDelay()) {
+            Sleep(200);			
+        }
+		
 
 		return tcpClient.receiveRawBytes(_data, _size);
 	}

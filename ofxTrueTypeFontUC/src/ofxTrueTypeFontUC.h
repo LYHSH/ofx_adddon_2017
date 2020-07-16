@@ -53,6 +53,8 @@ public:
   int getLimitCharactersNum();
   void reserveCharacters(int charactersNumber);
   
+  void setAnchorPercent(float xPct, float yPct);				//default: xpct = 0.0f,ypct = 0.0f
+  void anchorDraw(const std::string &str, float x, float y);	
 private:
   class Impl;
   Impl *mImpl;
@@ -60,4 +62,6 @@ private:
   // disallow copy and assign
   ofxTrueTypeFontUC(const ofxTrueTypeFontUC &);
   void operator=(const ofxTrueTypeFontUC &);
+
+  glm::vec2 anchorPercent;
 };

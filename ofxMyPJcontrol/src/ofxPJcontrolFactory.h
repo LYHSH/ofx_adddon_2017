@@ -19,7 +19,10 @@ typedef enum
 	PJ_TYPE_SML_NET = 6,
 	PJ_TYPE_DLP_NET = 7,
 	PJ_TYPE_CS_MOON_NET_1 = 8,
-	PJ_TYPE_CS_MOON_NET_2 = 9
+	PJ_TYPE_CS_MOON_NET_2 = 9,
+	PJ_TYPE_SHE_SHAN_6D_NET_2 = 10,
+	PJ_TYPE_CANNON_MU800Z = 11,
+	PJ_TYPE_VIVITEK_COM_2_NET = 12
 }PROJECT_TYPE;
 class ofxPJcontrolFactory
 {
@@ -39,7 +42,9 @@ public:
 
 	static ofxPJcontrolBase * createCSmoonNetPJ1(string _ip);
 	static ofxPJcontrolBase * createCSmoonNetPJ2(string _ip);
-
+	static ofxPJcontrolBase * createSheShan6DPJ(string _ip);
+	static ofxPJcontrolBase * createMU800Z(string _ip);
+	static ofxPJcontrolBase * createVivitekCom2NetPj(string _ip);
 
 };
 
